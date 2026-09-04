@@ -1,4 +1,4 @@
-# Stage 1: Install dependencies and build static assets
+# Stage 1: Build static assets
 FROM oven/bun:1 AS builder
 WORKDIR /app
 
@@ -8,13 +8,15 @@ RUN bun install --frozen-lockfile || bun install
 COPY . .
 RUN bun run build
 
-# Stage 2: Serve static files with Cloudflare Tunnel host permitted
+# Stage 2: Serve using static file server
 FROM oven/bun:1-slim
 WORKDIR /app
+
+RUN bun install -g serve
 
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 5173
 
-# Allow the specific tunnel domain or set to all
-CMD ["bun", "x", "vite", "preview", "--host", "0.0.0.0", "--port", "5173", "--allowed-hosts", "clashdrive-avk.renegade44apps.site"]
+# -s enables single-page application routing mode
+CMD ["serve", "-s", "dist", "-l", "5173"]
