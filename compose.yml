@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  clashdrive:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clashdrive
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=production
